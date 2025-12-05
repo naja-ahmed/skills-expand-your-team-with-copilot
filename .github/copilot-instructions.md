@@ -38,7 +38,7 @@ Consider the following when communicating with the staff.
 
 ### Quality considerations
 
-- If the tasks involves grades, scores, or other numerical data, isolate those functions and make sure they are correct with unit tests.
+- If the task involves grades, scores, or other numerical data, isolate those functions and make sure they are correct with unit tests.
 
 ### Security considerations
 
