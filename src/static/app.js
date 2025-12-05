@@ -479,6 +479,24 @@ document.addEventListener("DOMContentLoaded", () => {
     return { shareUrl, shareText };
   }
 
+  // Fallback copy to clipboard method for older browsers
+  function copyToClipboardFallback(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      showMessage('Link copied to clipboard!', 'success');
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+      showMessage('Failed to copy link', 'error');
+    }
+    document.body.removeChild(textarea);
+  }
+
   // Function to handle social sharing
   function handleShare(platform, activityName, activityDescription) {
     const { shareUrl, shareText } = getShareData(activityName, activityDescription);
@@ -502,13 +520,19 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
         break;
       case 'copy':
-        // Copy to clipboard
-        navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
-          showMessage('Link copied to clipboard!', 'success');
-        }).catch((err) => {
-          console.error('Failed to copy:', err);
-          showMessage('Failed to copy link', 'error');
-        });
+        // Copy to clipboard with fallback
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(`${shareText}\n\n${shareUrl}`).then(() => {
+            showMessage('Link copied to clipboard!', 'success');
+          }).catch((err) => {
+            console.error('Failed to copy:', err);
+            // Fallback to textarea method
+            copyToClipboardFallback(`${shareText}\n\n${shareUrl}`);
+          });
+        } else {
+          // Use fallback method for older browsers
+          copyToClipboardFallback(`${shareText}\n\n${shareUrl}`);
+        }
         break;
     }
   }
